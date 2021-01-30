@@ -1,26 +1,26 @@
 import { startOfHour } from "date-fns";
+import { getCustomRepository } from "typeorm";
 import Appointment from "../model/Appointment";
 import AppointmentsRepository from "../repositories/AppointmentsRepository";
 
 /**  */
 interface IRequestDTO {
-  provider: string;
+  provider_id: string;
   date: Date;
 }
 
 class CreateAppointmentService {
-  private appointmentsRepository: AppointmentsRepository;
+  public async execute({
+    provider_id,
+    date,
+  }: IRequestDTO): Promise<Appointment> {
+    /** Aqui estamos pegando todos os metods a serem executados */
+    const appointmentsRepository = getCustomRepository(AppointmentsRepository);
 
-  /** */
-  constructor(appointmentsRepository: AppointmentsRepository) {
-    this.appointmentsRepository = appointmentsRepository;
-  }
-
-  public execute({ provider, date }: IRequestDTO): Appointment {
     /** Regra de negocio da aplicação poderia ser de 15, 30, 45 minutos  */
     const initialDate = startOfHour(date);
 
-    const findAppointmentInSameDate = this.appointmentsRepository.findByDate(
+    const findAppointmentInSameDate = await appointmentsRepository.findByDate(
       initialDate
     );
 
@@ -28,10 +28,13 @@ class CreateAppointmentService {
       throw Error(`This appointment is already booked`);
     }
 
-    const appointment = this.appointmentsRepository.create({
-      provider,
+    /** Para criar um novo registro não precisamos do await */
+    const appointment = appointmentsRepository.create({
+      provider_id,
       date: initialDate,
     });
+
+    await appointmentsRepository.save(appointment);
 
     return appointment;
   }
