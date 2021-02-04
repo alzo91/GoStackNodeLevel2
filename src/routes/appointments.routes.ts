@@ -4,15 +4,20 @@ import { getCustomRepository } from "typeorm";
 // import Appointment from "../model/Appointment";
 import AppointmentsRepository from "../repositories/AppointmentsRepository";
 import CreateAppointmentService from "../services/CreateAppointmentService";
-
+import ensureAuthenticated from "../Middlewares/ensureAuthenticated";
 const appointmentsRouter = Router();
 
 /** Esta criando o vetor de appointments */
 // const appointmentsRepository = new AppointmentsRepository();
+appointmentsRouter.use(ensureAuthenticated);
 
 appointmentsRouter.get("/", async (request, response) => {
   const appointmentsRepository = getCustomRepository(AppointmentsRepository);
-  const appointments = await appointmentsRepository.find();
+  console.log(request.user);
+  const appointments = await appointmentsRepository.find({
+    where: { provider_id: request.user.id },
+    relations: ["provider"],
+  });
   return response.json(appointments);
 });
 
