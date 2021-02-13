@@ -2,7 +2,7 @@ import { startOfHour } from "date-fns";
 import { getCustomRepository } from "typeorm";
 import Appointment from "../model/Appointment";
 import AppointmentsRepository from "../repositories/AppointmentsRepository";
-
+import AppError from "../errors/AppError";
 /**  */
 interface IRequestDTO {
   provider_id: string;
@@ -25,7 +25,7 @@ class CreateAppointmentService {
     );
 
     if (!!findAppointmentInSameDate) {
-      throw Error(`This appointment is already booked`);
+      throw AppError(`This appointment is already booked`);
     }
 
     /** Para criar um novo registro não precisamos do await */
