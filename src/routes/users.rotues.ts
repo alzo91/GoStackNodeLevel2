@@ -13,7 +13,7 @@ usersRouter.post("/", async (request, response) => {
   const createUserService = new CreateUserService();
 
   const user = await createUserService.execute({ name, email, password });
-
+  delete user.password;
   return response.status(201).json(user);
 });
 
