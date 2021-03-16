@@ -25,7 +25,7 @@ class CreateAppointmentService {
     );
 
     if (!!findAppointmentInSameDate) {
-      throw AppError(`This appointment is already booked`);
+      throw new AppError(`This appointment is already booked`);
     }
 
     /** Para criar um novo registro não precisamos do await */
